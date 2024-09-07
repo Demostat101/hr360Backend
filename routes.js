@@ -95,9 +95,11 @@ router.post("/signup",/* upload.single("image"), */async (req,res)=>{
  //User login endpoint
 
  router.post("/login", async(req,res)=>{
+
     let user = await User.findOne({email:req.body.email});
     if (user) {
         const passwordCompare = req.body.password === user.password;
+       
         if (passwordCompare) {
             const data = {
                 user:{
@@ -105,8 +107,11 @@ router.post("/signup",/* upload.single("image"), */async (req,res)=>{
                 }
             }
 
+
+            
+
             const token = jwt.sign(data,"secret_ecom");
-            res.json({success:true,token});
+            res.json({success:true,token,message:"Logged in successfully",user:{name:user.name, surname:user.surname}});
         } else {
             res.json({success:false,errors:"Wrong Password"})
         } 
@@ -115,8 +120,6 @@ router.post("/signup",/* upload.single("image"), */async (req,res)=>{
         res.json({success:false, errors:"Wrong Email"})
     }
  })
-
-
 
 
 
