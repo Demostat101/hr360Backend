@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("./user");
 const router = express.Router();
 const jwt = require("jsonwebtoken")
+const bycrypt = require("bcrypt")
 // const cloudinary = require("./utils/cloudinary");
 // const upload = require("./utils/multer");
 
@@ -27,6 +28,18 @@ router.post("/signup",/* upload.single("image"), */async (req,res)=>{
     if (checkemail) {
         return res.status(400).json({success:false,errors:"Email already exist"})
     }
+
+    // if (password) {
+    //     bycrypt.hash(password,12)
+    //         .then(hashedPassword => {
+
+    //         }).catch( error => {
+    //             return res.status(500).send({
+    //                 error: "Enable to hashed password"
+    //             })
+    //         })
+    // }
+
 
     // if (checkpassword) {
     //     return res.status(400).json({success:false,errors:"Password already exist"})
@@ -128,7 +141,8 @@ router.post("/signup",/* upload.single("image"), */async (req,res)=>{
 router.get("/signup",async (req, res)=>{
     try {
         const users = await User.find({});
-        res.send(users);
+    
+        res.send(users)
        
         
     } catch (error) {
@@ -136,6 +150,27 @@ router.get("/signup",async (req, res)=>{
         res.status(500).send(error);
     }
 });
+
+//generate OTP random otp
+
+router.get("/generateOTP", async (req,res)=>{
+    
+})
+
+//verify generated otp
+router.get("/verifyOTP", async (req,res)=>{
+
+})
+
+//reset session.... 
+router.get("/createResetSession", async (req,res)=>{
+
+})
+
+//reset password
+router.put("/resetPassword", async (req,res)=>{
+
+})
 
 
 

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { any } = require("./utils/multer");
+const bcrypt = require("bcrypt")
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -32,6 +33,12 @@ const userSchema = new mongoose.Schema({
         default: Date.now
     }
 });
+
+    userSchema.pre("save", async function(next) {
+        const salt = await bcrypt.genSalt();
+        this.password = await bcrypt.hash(this.password, salt);
+        next()
+    })
 
     const User = mongoose.model("User", userSchema);
 
