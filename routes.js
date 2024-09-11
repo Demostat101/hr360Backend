@@ -2,7 +2,9 @@ const express = require("express");
 const User = require("./user");
 const router = express.Router();
 const jwt = require("jsonwebtoken")
-const bycrypt = require("bcrypt")
+const bcrypt = require("bcrypt")
+const otpGenerator = require("otp-generator")
+
 // const cloudinary = require("./utils/cloudinary");
 // const upload = require("./utils/multer");
 
@@ -111,7 +113,8 @@ router.post("/signup",/* upload.single("image"), */async (req,res)=>{
 
     let user = await User.findOne({email:req.body.email});
     if (user) {
-        const passwordCompare = req.body.password === user.password;
+        // const passwordCompare = req.body.password === user.password;
+        const passwordCompare = await bcrypt.compare(req.body.password,user.password)
        
         if (passwordCompare) {
             const data = {
@@ -153,13 +156,50 @@ router.get("/signup",async (req, res)=>{
 
 //generate OTP random otp
 
+// const localVariables = (req,res,next) => {
+//     req.app.locals = {
+//         OTP: null,
+//         resetSession:false
+//     }
+
+//     next()
+// }
+
+const OTP = async ()=>{
+    try {
+       return otpGenerator.generate(4, {lowerCaseAlphabets:false, upperCaseAlphabets:false, specialChars:false})
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+
+
+
 router.get("/generateOTP", async (req,res)=>{
     
+    let otp = await OTP()
+    console.log(otp);
+   
+    
+   res.status(201).send({code: otp})
+   const {code} = req.query;
+   console.log(code);
 })
 
 //verify generated otp
 router.get("/verifyOTP", async (req,res)=>{
+    const {code} = req.query;
+    if (parseInt(OTP()) === parseInt(code)) {
 
+        return res.status(201).send({message:"Verify Successfully"})
+    }
+console.log(code);
+console.log(await OTP());
+
+
+    return res.status(400).send({error:"Invalid OTP"});
 })
 
 //reset session.... 
