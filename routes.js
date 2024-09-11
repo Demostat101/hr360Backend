@@ -156,47 +156,42 @@ router.get("/signup",async (req, res)=>{
 
 //generate OTP random otp
 
-// const localVariables = (req,res,next) => {
-//     req.app.locals = {
-//         OTP: null,
-//         resetSession:false
-//     }
-
-//     next()
-// }
-
-const OTP = async ()=>{
-    try {
-       return otpGenerator.generate(4, {lowerCaseAlphabets:false, upperCaseAlphabets:false, specialChars:false})
-    } catch (error) {
-        console.log(error);
-        
+const localVariables = (req,res,next) => {
+    req.app.locals = {
+        OTP: null,
+        resetSession:false
     }
+
+    next()
+}
+
+const generateOTP = async (req,res)=>{
+    req.app.locals.OTP = await otpGenerator.generate(4, {lowerCaseAlphabets:false, upperCaseAlphabets:false, specialChars:false})
+    res.status(201).send({code:req.app.locals.OTP })
 }
 
 
 
 
-router.get("/generateOTP", async (req,res)=>{
+
+
+router.get("/generateOTP",localVariables,generateOTP, async (req,res)=>{
     
-    let otp = await OTP()
-    console.log(otp);
-   
-    
-   res.status(201).send({code: otp})
-   const {code} = req.query;
-   console.log(code);
+ 
 })
 
 //verify generated otp
 router.get("/verifyOTP", async (req,res)=>{
     const {code} = req.query;
-    if (parseInt(OTP()) === parseInt(code)) {
+    if (parseInt(req.app.locals.OTP) === parseInt(code)) {
 
+        req.app.locals.OTP = null
+        req.app.locals.resetSession = true
+
+        console.log(code);
         return res.status(201).send({message:"Verify Successfully"})
     }
-console.log(code);
-console.log(await OTP());
+// console.log(await OTP());
 
 
     return res.status(400).send({error:"Invalid OTP"});
@@ -205,10 +200,48 @@ console.log(await OTP());
 //reset session.... 
 router.get("/createResetSession", async (req,res)=>{
 
+    if (req.app.locals.resetSession) {
+        req.app.locals.resetSession = false;
+        return res.status(201).send({message:"Access granted"})
+    }
+
+    return res.status(440).send({error:"Session expired"})
 })
 
 //reset password
 router.put("/resetPassword", async (req,res)=>{
+
+    try {
+
+        if (!req.app.locals.resetSession) {
+            return res.status(440).send({error:"Session Expired"})
+        }
+
+
+        const {email,password} = req.body;
+
+
+        try {
+            User.findOne({email})
+            .then(userEmail =>{
+                bcrypt.hash(password,10)
+                    .then(hashedPassword => {
+                        User.updateOne({email:userEmail.email},{password:hashedPassword}, res.status(201).send({message:"Record Updated Succesfully"}))
+                    })
+                    // req.app.locals.resetSession = false
+                    .catch(error => {
+                        return res.status(500).send({error:"Enable to hashed password"})
+                    })
+            })
+            .catch(error => {
+                return res.status(404).send({error:"email not found"});
+            })
+        } catch (error) {
+            return res.status(500).send({error})
+        }
+    } catch (error) {
+        return res.status(401).send({error})
+    }
 
 })
 
