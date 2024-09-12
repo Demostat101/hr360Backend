@@ -3,7 +3,11 @@ const User = require("./user");
 const router = express.Router();
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
-const otpGenerator = require("otp-generator")
+const otpGenerator = require("otp-generator");
+// const { registerEmail } = require("./mail")
+
+const {sendMail} = require("./mail.js");
+
 
 // const cloudinary = require("./utils/cloudinary");
 // const upload = require("./utils/multer");
@@ -24,11 +28,11 @@ const otpGenerator = require("otp-generator")
 
 // insert a user into database route
 
-router.post("/signup",/* upload.single("image"), */async (req,res)=>{
+router.post("/signup",  /* upload.single("image"), */async (req,res)=>{
     let checkemail = await User.findOne({email:req.body.email});
     // let checkpassword = await User.findOne({password:req.body.password});
     if (checkemail) {
-        return res.status(400).json({success:false,errors:"Email already exist"})
+        return res.status(400).json({success:false,errors:"Email already exist"});
     }
 
     // if (password) {
@@ -136,6 +140,10 @@ router.post("/signup",/* upload.single("image"), */async (req,res)=>{
         res.json({success:false, errors:"Wrong Email"})
     }
  })
+ router.post("/register",sendMail, async(req,res)=>{
+
+ 
+ })
 
 
 
@@ -188,7 +196,6 @@ router.get("/verifyOTP", async (req,res)=>{
         req.app.locals.OTP = null
         req.app.locals.resetSession = true
 
-        console.log(code);
         return res.status(201).send({message:"Verify Successfully"})
     }
 // console.log(await OTP());
