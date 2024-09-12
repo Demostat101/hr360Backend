@@ -3,11 +3,10 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config()
 const Mailgen = require("mailgen");
-// const {Email, Password} = require("./env.js")
 
 const sendMail = async (req,res)=>{
 
-  const {email} = req.body
+  const {email,text,subject,name} = req.body
 
   let config = {
     host: "smtp.gmail.com",
@@ -32,13 +31,9 @@ const sendMail = async (req,res)=>{
 
   let response = {
     body:{
-      intro:"Your otp has been sent",
-      table:{
-        data: [{
-          OTP: "333",
-          
-      }]
-      }
+      name:name,
+      intro:text || "Otp sent",
+      outro:"Kindly fill and reset password"
     }
   }
 
@@ -47,7 +42,7 @@ let mail = MailGenerator.generate(response);
 let message = {
   from:process.env.USER_NAME,
   to:email,
-  subject:"Reset password otp",
+  subject: subject || "Signup successful",
   html:mail
 }
 

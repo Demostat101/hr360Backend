@@ -140,7 +140,7 @@ router.post("/signup",  /* upload.single("image"), */async (req,res)=>{
         res.json({success:false, errors:"Wrong Email"})
     }
  })
- router.post("/register",sendMail, async(req,res)=>{
+ router.post("/sendOtp",sendMail, async(req,res)=>{
 
  
  })
