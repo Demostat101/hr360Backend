@@ -162,6 +162,43 @@ router.get("/signup",async (req, res)=>{
     }
 });
 
+// Get a user 
+
+router.get("/user/:email", async (req,res)=>{
+    const {email} = req.params;
+    console.log(email);
+    
+
+    try {
+        
+        if (!email) {
+            return res.status(501).send({error:"invalid email"});
+        }
+
+        const users = (user)=>{
+            
+
+                if (!user) {
+                    return res.status(501).send({error:"not available"})
+                }
+                    console.log(user);
+                    
+                res.status(201).send(user);
+        
+        }
+        
+      
+        
+         User.findOne({email},users )
+        
+    } catch (error) {
+        return res.status(404).send({error:"Cannot find User Data"})
+    }
+    
+})
+
+
+
 //generate OTP random otp
 
 const localVariables = (req,res,next) => {
