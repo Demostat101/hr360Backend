@@ -78,7 +78,7 @@ router.post("/signup",  /* upload.single("image"), */async (req,res)=>{
 
     // try {
     //     const user = new User({
-    //         name:req.body.first_name,
+    //         name:req.body.email,
     //         surname:req.body.surname,
     //         email:req.body.email,
     //         password:req.body.password
@@ -140,87 +140,83 @@ router.post("/signup",  /* upload.single("image"), */async (req,res)=>{
         res.json({success:false, errors:"Wrong Email"})
     }
  })
- router.post("/sendOtp",sendMail, async(req,res)=>{
-
  
- })
-
-
-
-// get all users
-
-router.get("/signup",async (req, res)=>{
-    try {
-        const users = await User.find({});
-    
-        res.send(users)
-       
-        
-    } catch (error) {
-        console.error(error);
-        res.status(500).send(error);
-    }
-});
-
-// Get a user 
-
-router.get("/user/:email", async (req,res)=>{
-    const {email} = req.params;
-    console.log(email);
-    
-
-    try {
-        
-        if (!email) {
-            return res.status(501).send({error:"invalid email"});
+ 
+ 
+ // get all users
+ 
+ router.get("/signup",async (req, res)=>{
+     try {
+         const users = await User.find({});
+         
+         res.send(users)
+         
+         
+        } catch (error) {
+            console.error(error);
+            res.status(500).send(error);
         }
-
-        const users = (user)=>{
+    });
+    
+    // Get a user 
+    
+    router.get("/user/:email", async (req,res)=>{
+        const email = req.params.email;
+        console.log(email);
+        
+        
+        try {
             
-
-                if (!user) {
-                    return res.status(501).send({error:"not available"})
-                }
-                    console.log(user);
-                    
-                res.status(201).send(user);
-        
+            if (!email) {
+                return res.status(501).send({error:"invalid email"});
+            }
+            
+            const user = await User.findOne({
+                email
+            });
+            
+            if (!user) {
+                return res.status(501).send({error:"couldnt find any user email"})
+            }
+            // TO HIDE USER PASSWORD
+            const {password, ...rest} = Object.assign({}, user.toJSON())
+            
+            res.status(201).send(rest)
+            
+        } catch (error) {
+            return res.status(404).send({error:"Cannot find User Data"})
         }
         
-      
+    })
+    
+    
+    
+    //generate OTP random otp
+    
+    const localVariables = (req,res,next) => {
+        req.app.locals = {
+            OTP: null,
+            resetSession:false
+        }
         
-         User.findOne({email},users )
-        
-    } catch (error) {
-        return res.status(404).send({error:"Cannot find User Data"})
+        next()
     }
     
-})
-
-
-
-//generate OTP random otp
-
-const localVariables = (req,res,next) => {
-    req.app.locals = {
-        OTP: null,
-        resetSession:false
+    const generateOTP = async (req,res)=>{
+        req.app.locals.OTP = await otpGenerator.generate(4, {lowerCaseAlphabets:false, upperCaseAlphabets:false, specialChars:false})
+        res.status(201).send({code:req.app.locals.OTP });
     }
-
-    next()
-}
-
-const generateOTP = async (req,res)=>{
-    req.app.locals.OTP = await otpGenerator.generate(4, {lowerCaseAlphabets:false, upperCaseAlphabets:false, specialChars:false})
-    res.status(201).send({code:req.app.locals.OTP })
-}
-
-
-
-
-
-
-router.get("/generateOTP",localVariables,generateOTP, async (req,res)=>{
+    
+    
+    
+    
+    router.post("/sendOtp",sendMail, async(req,res)=>{
+   
+    
+    })
+    
+    
+    router.get("/generateOTP",localVariables,generateOTP, async (req,res)=>{
     
  
 })
