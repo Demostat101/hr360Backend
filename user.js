@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { any } = require("./utils/multer");
 const bcrypt = require("bcrypt")
 const userSchema = new mongoose.Schema({
     name: {
@@ -21,11 +20,6 @@ const userSchema = new mongoose.Schema({
         required:true,
         unique:true
     },
-    // cloudinary_id: {
-    //     type:String,
-    //     required:false
-        
-    // },
  
     created: {
         type:Date,
