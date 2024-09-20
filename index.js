@@ -11,7 +11,7 @@ const app = express();
 
 
 app.use(bodyParser.json());
-app.use(cors({origin:"*", optionsSuccessStatus:200}));
+app.use(cors({origin:"*", optionsSuccessStatus:200,optionsSuccessStatus:201}));
 app.use("/", routes);
 app.use(express.urlencoded({extended:false}))
 
