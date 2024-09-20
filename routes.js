@@ -101,7 +101,7 @@ router.get("/user/:email", async (req, res) => {
     // TO HIDE USER PASSWORD
     const { password, ...rest } = Object.assign({}, user.toJSON());
 
-    res.status(201).send(rest);
+    res.status(200).send(rest);
   } catch (error) {
     return res.status(404).send({ error });
   }
@@ -124,7 +124,7 @@ const generateOTP = async (req, res) => {
     upperCaseAlphabets: false,
     specialChars: false,
   });
-  res.status(201).send({ code: req.app.locals.OTP });
+  res.status(200).send({ code: req.app.locals.OTP });
 };
 
 router.post("/sendOtp", sendMail, async (req, res) => {});
@@ -138,7 +138,7 @@ router.get("/verifyOTP", async (req, res) => {
     req.app.locals.OTP = null;
     req.app.locals.resetSession = true;
 
-    return res.status(201).send({ message: "Verify Successfully" });
+    return res.status(200).send({ message: "Verify Successfully" });
   }
 
   return res.status(400).send({ error: "Invalid OTP" });
@@ -148,7 +148,7 @@ router.get("/verifyOTP", async (req, res) => {
 router.get("/createResetSession", async (req, res) => {
   if (req.app.locals.resetSession) {
     req.app.locals.resetSession = false;
-    return res.status(201).send({ message: "Access granted" });
+    return res.status(200).send({ message: "Access granted" });
   }
 
   return res.status(440).send({ error: "Session expired" });
