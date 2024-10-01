@@ -21,7 +21,7 @@ const allowedOrigins = [
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST', 'OPTIONS',"PATCH","DELETE"], // Allowed methods
+    methods: ['GET', 'POST', 'OPTIONS',"PATCH","DELETE,PUT"], // Allowed methods
     allowedHeaders: ['Content-Type'], // Allowed headers
     credentials: true, // If you need to include credentials
   };
