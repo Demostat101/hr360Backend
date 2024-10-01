@@ -127,7 +127,16 @@ const generateOTP = async (req, res) => {
   res.status(200).send({ code: req.app.locals.OTP });
 };
 
-router.post("/sendOtp", sendMail, async (req, res) => {});
+router.post("/sendOtp", sendMail, async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!isValidEmail(email)) {
+      return res.status(400).send({ message: "Invalid email address." });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "An error occurred." });
+  }
+});
 
 router.get("/generateOTP", localVariables, generateOTP, async (req, res) => {});
 
